@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infinity MSP · Coming Soon</title>
+<style>
+  :root{--paper:#e6f0ff;--muted:#9fb4d6;--bg:#05080f;}
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden;background:var(--bg)}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--paper);-webkit-tap-highlight-color:transparent;position:relative}
+  .backdrop{position:fixed;inset:0;z-index:0;
+    background:radial-gradient(70% 55% at 22% -6%,rgba(59,130,246,.34),transparent 60%),
+      radial-gradient(80% 60% at 88% 106%,rgba(34,211,238,.16),transparent 60%),
+      radial-gradient(120% 120% at 50% 42%,#0a1330,#05080f 80%);}
+  canvas{position:fixed;inset:0;z-index:1;display:block;touch-action:none}
+  .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(46% 40% at 50% 50%,rgba(5,8,15,.72),rgba(5,8,15,.35) 55%,transparent 72%);}
+  .wrap{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 22px;}
+  .logo{width:clamp(64px,9vw,92px);height:clamp(64px,9vw,92px);border-radius:24%;display:grid;place-items:center;
+    background:linear-gradient(150deg,#3b82f6,#2aa8e0 55%,#22d3ee);box-shadow:0 14px 50px rgba(59,130,246,.5),inset 0 1px 2px rgba(255,255,255,.45);}
+  .logo svg{width:60%;height:60%}
+  .soon{margin:clamp(20px,3vh,32px) 0 clamp(24px,4vh,40px);font-size:clamp(11px,1.4vw,13px);letter-spacing:.4em;font-weight:700;text-transform:uppercase;
+    color:#bae6fd;padding:.6rem 1.3rem;border-radius:100px;border:1px solid rgba(80,160,220,.45);background:rgba(59,130,246,.06);}
+  .wordmark{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-weight:800;line-height:.9;letter-spacing:-.015em;font-size:clamp(52px,10vw,120px);text-transform:uppercase;}
+  .wordmark .a{background:linear-gradient(180deg,#ffffff,#d6e6ff);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .wordmark .b{background:linear-gradient(100deg,#22d3ee,#3b82f6 55%,#2563eb);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .tagline{margin-top:clamp(22px,3.2vh,34px);font-size:clamp(16px,2vw,22px);color:var(--muted);font-weight:400;}
+  .inq{margin-top:clamp(30px,5vh,52px);font-size:clamp(12px,1.5vw,15px);color:#7f92b4;font-weight:500;}
+  .email{margin-top:.9rem;display:inline-block;text-decoration:none;font-weight:700;color:#fff;font-size:clamp(14px,1.8vw,18px);
+    padding:.75rem 1.7rem;border-radius:100px;background:linear-gradient(100deg,#2563eb,#22d3ee);box-shadow:0 10px 40px rgba(37,99,235,.5);transition:.2s;}
+  .email:hover{filter:brightness(1.08);transform:translateY(-1px)}
+</style>
+</head>
+<body>
+  <div class="backdrop"></div>
+  <canvas id="stage"></canvas>
+  <div class="vignette"></div>
+  <div class="wrap">
+    <div class="logo"><svg viewBox="0 0 96 96" fill="none"><path d="M48 48 C48 33 26 33 26 48 C26 63 48 63 48 48 C48 33 70 33 70 48 C70 63 48 63 48 48 Z" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="soon">Coming soon</div>
+    <div class="wordmark"><span class="a">Infinity</span><br><span class="b">MSP</span></div>
+    <div class="tagline">Our site is on the way.</div>
+    <div class="inq">For inquiries:</div>
+    <a class="email" href="mailto:ash@infinityengine.ai">ash@infinityengine.ai</a>
+  </div>
+<script>
+(() => {
+  const canvas=document.getElementById('stage'),ctx=canvas.getContext('2d');
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W,H,DPR,stars=[];
+  function makeStars(){stars=[];const N=Math.min(70,Math.floor(W*H/22000));
+    for(let i=0;i<N;i++)stars.push({x:Math.random()*W,y:Math.random()*H*0.9,r:Math.random()*1.4+0.35,a:0.12+Math.random()*0.4,c:Math.random()<0.5?'#7dd3fc':'#93c5fd'});}
+  function resize(){DPR=Math.min(window.devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(DPR,0,0,DPR,0,0);makeStars();}
+  resize();addEventListener('resize',resize);
+  const faceCv=document.createElement('canvas');faceCv.width=faceCv.height=96;const fcx=faceCv.getContext('2d');
+  function rr(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+  (function(){const g=fcx.createLinearGradient(14,14,82,82);g.addColorStop(0,'#3b82f6');g.addColorStop(.55,'#2aa8e0');g.addColorStop(1,'#22d3ee');
+    rr(fcx,12,12,72,72,20);fcx.fillStyle=g;fcx.fill();fcx.beginPath();fcx.moveTo(48,49);
+    fcx.bezierCurveTo(48,49-0.62*17,48-0.92*17,49-0.62*17,48-0.92*17,49);fcx.bezierCurveTo(48-0.92*17,49+0.62*17,48,49+0.62*17,48,49);
+    fcx.bezierCurveTo(48,49-0.62*17,48+0.92*17,49-0.62*17,48+0.92*17,49);fcx.bezierCurveTo(48+0.92*17,49+0.62*17,48,49+0.62*17,48,49);
+    fcx.lineWidth=8;fcx.lineCap='round';fcx.lineJoin='round';fcx.strokeStyle='#fff';fcx.stroke();})();
+  const DENOMS=[{v:1,tint:'#8bbf6c'},{v:20,tint:'#7fb56a'},{v:100,tint:'#9ac97e'}];
+  const backs={'#8bbf6c':'#3f6b46','#7fb56a':'#3a6242','#9ac97e':'#436b4e'};
+  function pick(){const r=Math.random();return r<0.5?DENOMS[2]:r<0.8?DENOMS[1]:DENOMS[0];}
+  const bills=[];const MAX=reduced?26:64;
+  function Bill(x,y,vx,vy,sz){const d=pick();return{x,y,vx,vy,w:sz,h:sz*0.44,ang:Math.random()*6.28,spin:(Math.random()-0.5)*0.05,flut:Math.random()*6.28,flutSpeed:0.03+Math.random()*0.03,d};}
+  function spawn(b){if(bills.length>=MAX)bills.shift();bills.push(b);}
+  function rr2(c,x,y,w,h,r){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();}
+  function drawBill(b){const fl=Math.cos(b.flut),sx=Math.max(0.08,Math.abs(fl)),front=fl>=0,w=b.w,h=b.h;
+    ctx.save();ctx.translate(b.x,b.y);ctx.rotate(b.ang);ctx.scale(sx,1);ctx.shadowColor='rgba(0,0,0,0.35)';ctx.shadowBlur=8;ctx.shadowOffsetY=4;
+    if(!front){rr2(ctx,-w/2,-h/2,w,h,4);ctx.fillStyle=backs[b.d.tint];ctx.fill();ctx.shadowColor='transparent';rr2(ctx,-w/2+4,-h/2+4,w-8,h-8,3);ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1;ctx.stroke();
+      ctx.fillStyle='rgba(0,0,0,.18)';ctx.font='italic '+(h*0.5)+'px Georgia,serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('$',0,0);ctx.restore();return;}
+    rr2(ctx,-w/2,-h/2,w,h,4);ctx.fillStyle=b.d.tint;ctx.fill();ctx.shadowColor='transparent';
+    const g=ctx.createLinearGradient(0,-h/2,0,h/2);g.addColorStop(0,'rgba(255,255,255,.22)');g.addColorStop(.5,'rgba(255,255,255,0)');g.addColorStop(1,'rgba(0,0,0,.12)');rr2(ctx,-w/2,-h/2,w,h,4);ctx.fillStyle=g;ctx.fill();
+    rr2(ctx,-w/2+3.5,-h/2+3.5,w-7,h-7,3);ctx.strokeStyle='rgba(15,42,28,.5)';ctx.lineWidth=1;ctx.stroke();
+    ctx.beginPath();ctx.ellipse(0,0,h*0.34,h*0.34,0,0,6.28);ctx.fillStyle='rgba(230,240,255,.22)';ctx.fill();ctx.strokeStyle='rgba(15,42,28,.4)';ctx.lineWidth=1;ctx.stroke();
+    ctx.fillStyle='rgba(15,42,28,.8)';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='700 '+(h*0.24)+'px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif';
+    ctx.fillText(b.d.v,-w/2+w*0.16,-h/2+h*0.26);ctx.fillText(b.d.v,w/2-w*0.16,h/2-h*0.26);const dia=h*0.64;ctx.drawImage(faceCv,-dia/2,-dia/2,dia,dia);ctx.restore();}
+  function drawSpace(){const horizon=H*0.30,vpx=W/2,vpy=H*0.04,cols=12,spread=W*0.98;ctx.lineWidth=1;ctx.strokeStyle='rgba(56,189,248,0.10)';
+    for(let i=-cols;i<=cols;i++){const bx=W/2+i*(spread/cols);ctx.beginPath();ctx.moveTo(bx,H);ctx.lineTo(vpx,vpy);ctx.stroke();}
+    const rows=10;for(let k=1;k<rows;k++){let f=(k/rows);f=f*f;const y=horizon+(H-horizon)*f;ctx.globalAlpha=0.10*(1-f*0.3);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}ctx.globalAlpha=1;
+    for(const s of stars){ctx.globalAlpha=s.a;ctx.fillStyle=s.c;ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);ctx.fill();}ctx.globalAlpha=1;}
+  let acc=0;const G=0.03;
+  function frame(){ctx.clearRect(0,0,W,H);drawSpace();
+    acc+=reduced?0.06:0.22;while(acc>=1){spawn(Bill(Math.random()*W,-50,(Math.random()-0.5)*0.4,0.5+Math.random()*0.7,44+Math.random()*26));acc-=1;}
+    for(let i=bills.length-1;i>=0;i--){const b=bills[i];b.vy+=G;b.vy=Math.min(b.vy,2.4);b.x+=b.vx;b.y+=b.vy;b.ang+=b.spin;b.flut+=b.flutSpeed;b.x+=Math.sin(b.flut)*0.3;drawBill(b);if(b.y-60>H||b.x<-140||b.x>W+140)bills.splice(i,1);}
+    requestAnimationFrame(frame);}
+  frame();
+  addEventListener('pointerdown',e=>{if(e.target.closest('a'))return;for(let i=0;i<6;i++){const a=Math.random()*Math.PI-Math.PI,sp=2+Math.random()*4;spawn(Bill(e.clientX,e.clientY,Math.cos(a)*sp,Math.sin(a)*sp-2,44+Math.random()*24));}});
+})();
+</script>
+</body>
+</html>
